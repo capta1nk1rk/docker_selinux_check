@@ -43,7 +43,7 @@ class SE_checker:
     def selinux_check(self, txtfile):
         #self.selinux_current_status
         for line in txtfile:
-            if re.match("SELINUX=enabled", line):
+            if re.match("SELINUX=enforcing", line):
                 self.selinux_current_status = "***SELINUX ENABLED***"
         print(self.selinux_current_status)
 
