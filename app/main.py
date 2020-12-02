@@ -58,8 +58,8 @@ def main_webpage():
     if se_checker.error_occurred_hostname is True:
         html += "<p>Hostname of Current Node: " + se_checker.error_message_hostname + "</p>"
     else:
-        html += "<p>Hostname of Current Node: " + str(se_checker.hostname_file) + "</p>"
-    html += "<p><b>Full output of SELinux Config:</b></p>"
+        html += "<br><p><b>Hostname of Current Node: </b>" + str(se_checker.hostname_file) + "</p>"
+    html += "<br><p><b>Full output of SELinux Config:</b></p>"
     html += "<p>"
     if se_checker.error_occurred_selinux is True:
         html += se_checker.error_message_selinux
