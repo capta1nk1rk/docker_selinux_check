@@ -1,45 +1,53 @@
 import re
 import os
 import os.path
+import socket
 from flask import Flask
 
 app = Flask(__name__, static_url_path = "", static_folder = "/static")
 
+class FileParser:
+    # Constructor
+    def __init__(self, path):
+        # init error var
+        self.error_occurred = False
+
+        # start reader
+        self.file_reader(path)
+
+    # Read in file, split string into a list
+    # Catch error if file not found
+    def file_reader(self, path):
+        try:
+            self.file = open(path, 'r')
+            self.file = self.file.read().splitlines()
+        except IOError:
+            self.error_occurred = True
+            self.error_message = "FILE NOT FOUND"
+
 class SE_checker:
     # Constructor
     def __init__(self):
-        # Instance Vars
-        self.hostname_path = "/etc/hostname"
-        self.hostname_file = ""
+
+        # Relevant File Paths to pass to reader
+        self.container_hostname_path = "/etc/hostname"
+        self.node_hostname_path = "/etc/nodehostname"
+        self.namespace_path = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
         self.selinux_config_path = "/etc/selinux/config"
-        self.selinux_config_file = ""
+    
+        # Default Status to False:
         self.selinux_current_status = "***SELINUX NOT ENABLED***"
 
-        # Error Checking
-        self.error_occurred_selinux = False
-        self.error_occurred_hostname = False
+        # Create objects, parse files
+        self.container_hostname_parser = FileParser(self.container_hostname_path)
+        self.node_hostname_parser = FileParser(self.node_hostname_path)
+        self.namespace_parser = FileParser(self.namespace_path)
+        self.selinux_parser = FileParser(self.selinux_config_path)
         
-        self.selinux_reader()
-        self.hostname_reader()
-        self.selinux_check(self.selinux_config_file)
+        # Check SEStatus of Config File
+        self.selinux_check(self.selinux_parser.file)
 
-    # Main Functions
-    def selinux_reader(self):
-        try:
-            self.selinux_config_file = open(self.selinux_config_path, 'r')
-            self.selinux_config_file = self.selinux_config_file.read().splitlines()
-        except IOError:
-            self.error_occurred_selinux = True
-            self.error_message_selinux = "FILE NOT FOUND"
-    
-    def hostname_reader(self):
-        try:
-            self.hostname_file = open(self.hostname_path, 'r')
-            self.hostname_file = self.hostname_file.read().splitlines()
-        except IOError:
-            self.error_occured_hostname = True
-            self.error_message_hostname = "FILE NOT FOUND"
-
+    # Parse info in selinux config
     def selinux_check(self, txtfile):
         #self.selinux_current_status
         for line in txtfile:
@@ -55,20 +63,40 @@ def main_webpage():
         status_image = "/checkmark.jpg"
     html = "<h2>" + str(se_checker.selinux_current_status) + "</h2>"
     html += "<img src=\"%s\">" % status_image
-    if se_checker.error_occurred_hostname is True:
-        html += "<p>Hostname of Current Node: " + se_checker.error_message_hostname + "</p>"
+
+    # Grab and Display Node Hostname
+    if se_checker.node_hostname_parser.error_occurred is True:
+        html += "<p><b>Hostname of Current Node (via /etc/hostname): </b>" + se_checker.node_hostname_parser.error_message + "</p>"
     else:
-        html += "<br><p><b>Hostname of Current Node: </b>" + str(se_checker.hostname_file) + "</p>"
+        html += "<p><b>Hostname of Current Node (via /etc/hostname): </b>" + str(se_checker.node_hostname_parser.file) + "</p>"
+    
+    # Grab and Display Container Hostname
+    if se_checker.container_hostname_parser.error_occurred is True:
+        html += "<p><b>Hostname of Current Container (via /etc/hostname): </b>" + se_checker.container_hostname_parser.error_message + "</p>"
+        html += "<p><b>Hostname of Current Container (via socket): </b>" + socket.gethostname() + "</p>"
+    else:
+        html += "<p><b>Hostname of Current Container (via /etc/hostname): </b>" + str(se_checker.container_hostname_parser.file) + "</p>"
+        html += "<p><b>Hostname of Current Container (via socket): </b>" + socket.gethostname() + "</p>"
+
+# Grab and Display IP:
+    html += "<p><b>IP Address of Current Container: </b>" + socket.gethostbyname(socket.gethostname()) + "</p>"
+
+    # Grab and Display Namespace
+    if se_checker.namespace_parser.error_occurred is True:
+        html += "<b><p>Namespace of Current Pod/Deployment: </b>" + str(se_checker.namespace_parser.error_message) + "</p>"
+    else:
+        html += "<p><b>Namespace of Current Pod/Deployment: </b>" + str(se_checker.namespace_parser.file) + "</p>"
+
+    # Display output of SELinux Config
     html += "<br><p><b>Full output of SELinux Config:</b></p>"
     html += "<p>"
-    if se_checker.error_occurred_selinux is True:
-        html += se_checker.error_message_selinux
+    if se_checker.selinux_parser.error_occurred is True:
+        html += se_checker.selinux_parser.error_message
     else:
-        for line in se_checker.selinux_config_file:
+        for line in se_checker.selinux_parser.file:
             html += "<p>" + line + "</p>"
     
     return html
-
 
 # Main
 if __name__ == '__main__':
