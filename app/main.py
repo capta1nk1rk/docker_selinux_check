@@ -34,6 +34,7 @@ class SE_checker:
         self.node_hostname_path = "/etc/nodehostname"
         self.namespace_path = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
         self.selinux_config_path = "/etc/selinux/config"
+        self.container_runtime_path = "/var/run/systemd/container"
     
         # Default Status to False:
         self.selinux_current_status = "***SELINUX NOT ENABLED***"
@@ -43,6 +44,7 @@ class SE_checker:
         self.node_hostname_parser = FileParser(self.node_hostname_path)
         self.namespace_parser = FileParser(self.namespace_path)
         self.selinux_parser = FileParser(self.selinux_config_path)
+        self.container_runtime_parser = FileParser(self.container_runtime_path)
         
         # Check SEStatus of Config File
         self.selinux_check(self.selinux_parser.file)
@@ -64,28 +66,40 @@ def main_webpage():
     html = "<h2>" + str(se_checker.selinux_current_status) + "</h2>"
     html += "<img src=\"%s\">" % status_image
 
+    # Start Table
+    html += "<table style=\"width:80%\">"
+
     # Grab and Display Node Hostname
     if se_checker.node_hostname_parser.error_occurred is True:
-        html += "<p><b>Hostname of Current Node (via /etc/hostname): </b>" + se_checker.node_hostname_parser.error_message + "</p>"
+        html += "<tr><td><b>Hostname of Current Node (via /etc/hostname): </b></td><td>" + se_checker.node_hostname_parser.error_message + "</td></tr>"
     else:
-        html += "<p><b>Hostname of Current Node (via /etc/hostname): </b>" + str(se_checker.node_hostname_parser.file) + "</p>"
+        html += "<tr><td><b>Hostname of Current Node (via /etc/hostname): </b></td><td>" + str(se_checker.node_hostname_parser.file) + "</td></tr>"
     
     # Grab and Display Container Hostname
     if se_checker.container_hostname_parser.error_occurred is True:
-        html += "<p><b>Hostname of Current Container (via /etc/hostname): </b>" + se_checker.container_hostname_parser.error_message + "</p>"
-        html += "<p><b>Hostname of Current Container (via socket): </b>" + socket.gethostname() + "</p>"
+        html += "<tr><td><b>Hostname of Current Container (via /etc/hostname): </b></td><td>" + se_checker.container_hostname_parser.error_message + "</td></tr>"
+        html += "<tr><td><b>Hostname of Current Container (via socket): </b></td><td>" + socket.gethostname() + "</td></tr>"
     else:
-        html += "<p><b>Hostname of Current Container (via /etc/hostname): </b>" + str(se_checker.container_hostname_parser.file) + "</p>"
-        html += "<p><b>Hostname of Current Container (via socket): </b>" + socket.gethostname() + "</p>"
+        html += "<tr><td><b>Hostname of Current Container (via /etc/hostname): </b></td><td>" + str(se_checker.container_hostname_parser.file) + "</td></tr>"
+        html += "<tr><td><b>Hostname of Current Container (via socket): </b></td><td>" + socket.gethostname() + "</td></tr>"
 
-# Grab and Display IP:
-    html += "<p><b>IP Address of Current Container: </b>" + socket.gethostbyname(socket.gethostname()) + "</p>"
+    # Grab and Display IP:
+    html += "<tr><td><b>IP Address of Current Container: </b></td><td>" + socket.gethostbyname(socket.gethostname()) + "</td></tr>"
 
     # Grab and Display Namespace
     if se_checker.namespace_parser.error_occurred is True:
-        html += "<b><p>Namespace of Current Pod/Deployment: </b>" + str(se_checker.namespace_parser.error_message) + "</p>"
+        html += "<tr><td><b>Namespace of Current Pod/Deployment: </b></td><td>" + str(se_checker.namespace_parser.error_message) + "</td></tr>"
     else:
-        html += "<p><b>Namespace of Current Pod/Deployment: </b>" + str(se_checker.namespace_parser.file) + "</p>"
+        html += "<tr><td><b>Namespace of Current Pod/Deployment: </b></td><td>" + str(se_checker.namespace_parser.file) + "</td></tr>"
+
+    # Grab and Display Container Runtime
+    if se_checker.container_runtime_parser.error_occurred is True:
+        html += "<tr><td><b>Container Runtime Engine: </b></td><td>" + str(se_checker.container_runtime_parser.error_message) + "</td></tr>"
+    else:
+        html += "<tr><td><b>Container Runtime Engine: </b></td><td>" + str(se_checker.container_runtime_parser.file) + "</td></tr>"
+
+    # End of table
+    html += "</table>"
 
     # Display output of SELinux Config
     html += "<br><p><b>Full output of SELinux Config:</b></p>"
