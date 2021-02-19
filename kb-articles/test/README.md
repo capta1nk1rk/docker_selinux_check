@@ -16,6 +16,8 @@ Currently, as of 12/18/20, only static ips \(or statically assigned DHCP leases\
 
 ####  
 
+{% page-ref page="./" %}
+
 #### **Initial Server Configuration:** 
 
 Let us assume the following example network setup for this scenario.  We are going to create an RKE2 High Availability cluster on the following machines: 
