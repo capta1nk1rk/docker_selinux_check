@@ -10,7 +10,8 @@
 
 ## Customer Resources
 
-* [Untitled](customer-resources/untitled.md)
+* [Untitled](customer-resources/untitled/README.md)
+  * [Untitled 2](customer-resources/untitled/untitled-2.md)
 
 ---
 
