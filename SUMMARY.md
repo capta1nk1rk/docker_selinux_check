@@ -4,8 +4,8 @@
 
 ## KB Articles
 
-* [Table of Contents](kb-articles/untitled.md)
-* [Instantiating a RKE2 cluster on machines with multiple network interfaces](kb-articles/test.md)
+* [Table of Contents](kb-articles/untitled/README.md)
+  * [Instantiating a RKE2 cluster on machines with multiple network interfaces](kb-articles/untitled/test.md)
 
 ## Customer Resources
 
