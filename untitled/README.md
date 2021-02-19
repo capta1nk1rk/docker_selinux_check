@@ -1,2 +1,2 @@
-# Table of Contents
+# KB Articles
 

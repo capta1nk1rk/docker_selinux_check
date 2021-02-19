@@ -10,7 +10,7 @@
 ---
 
 * [Rancher Main Page](https://rancher.com)
-* [Table of Contents](untitled/README.md)
+* [KB Articles](untitled/README.md)
   * [Instantiating a RKE2 cluster on machines with multiple network interfaces](untitled/test.md)
   * [Mikes KB 0](untitled/mikes-kb-0.md)
 
