@@ -1,12 +1,5 @@
 # Table of contents
 
-* [Rancher Federal Customer Portal](README.md)
-
-## KB Articles
-
-* [Instantiating a RKE2 cluster on machines with multiple network interfaces](kb-articles/test.md)
-
-## Customer Resources
-
-* [Untitled](customer-resources/untitled.md)
+* [docker\_selinux\_check](README.md)
+* [Table of Contents](table-of-contents.md)
 
