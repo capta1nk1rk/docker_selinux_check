@@ -16,7 +16,7 @@ Currently, as of 12/18/20, only static ips \(or statically assigned DHCP leases\
 
 ####  
 
-{% page-ref page="./" %}
+{% page-ref page="test.md" %}
 
 #### **Initial Server Configuration:** 
 
